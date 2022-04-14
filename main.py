@@ -190,6 +190,8 @@ def main():
     eph = 1
     while condition:
         nsd_train_graphs = copy.deepcopy(train_graphs)
+        if None in list_1:
+            print('Error')
         nsd_train_graphs = [nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx]) for idx in range(len(train_graphs))]
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
