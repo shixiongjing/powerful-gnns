@@ -195,7 +195,7 @@ def main():
                 print('Error')
         nsd_train_graphs = [nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx]) for idx in range(len(train_graphs))]
         for x in nsd_train_graphs:
-            if x.node_features is None:
+            if x is None:
                 print('Error: NOOOOOOOO!')
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
