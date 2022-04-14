@@ -184,12 +184,12 @@ def main():
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
 
-    df_tags = [graph.label for graph in train_graphs]
+    df_tags = [3 if graph.label == 0 else 4 for graph in train_graphs]
     #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
     best_tag = [-1]*len(train_graphs)
     while condition:
         nsd_train_graphs = copy.deepcopy(train_graphs)
-        nsd_train_graphs = [nsd_train_graphs[idx].add_noise()]
+        nsd_train_graphs = [nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx]) for idx in range(len(train_graphs))]
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, epoch, 30)
 
@@ -206,6 +206,8 @@ def main():
 
     poisoned_train_graphs = [train_graphs[i].add_noise(noise[i], df_tags[i]) for i in range(len(train_graphs))]
     train_graphs = poisoned_train_graphs
+    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
+
     #########################################
     #
     #
