@@ -50,6 +50,8 @@ class S2VGraph(object):
         if S2VGraph.tag2index:
             self.node_features = torch.zeros(len(self.node_tags), len(S2VGraph.tag2index))
             self.node_features[range(len(self.node_tags)), [S2VGraph.tag2index[tag] for tag in self.node_tags]] = 1
+        else:
+            print('Error. Fail to find Tag2index')
 
 
 
