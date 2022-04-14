@@ -104,7 +104,7 @@ def min_min_attack(args, train_graphs, model, noise, tags, rounds):
             temp_graph = copy.deepcopy(batch_graph[i])
             cur_tag = batch_tags[i]
             cur_noise = batch_noise[i]
-            for dim in len(temp_graph.g):
+            for dim in range(len(temp_graph.g)):
                 flip(cur_noise, dim)
                 new_graph = [temp_graph.add_noise(cur_noise, cur_tag)]
                 output = model(new_graph)
