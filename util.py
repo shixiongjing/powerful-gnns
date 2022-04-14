@@ -23,7 +23,7 @@ class S2VGraph(object):
 
         self.max_neighbor = 0
 
-    def add_noise(adj_noise, tag):
+    def add_noise(self, adj_noise, tag):
         node_id = len(self.g)
         self.g.add_node(node_id)
 
