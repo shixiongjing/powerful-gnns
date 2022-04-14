@@ -102,7 +102,7 @@ def min_min_attack(args, train_graphs, model, noise, tags, rounds):
             # For each graph, do numeric gradient
             prev_loss = float('inf')
             temp_graph = copy.deepcopy(batch_graph[i])
-            cur_tag = batch_tag[i]
+            cur_tag = batch_tags[i]
             cur_noise = batch_noise[i]
             for dim in len(temp_graph.g):
                 flip(cur_noise, dim)
