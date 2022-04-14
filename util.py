@@ -53,6 +53,8 @@ class S2VGraph(object):
         else:
             print('Error. Fail to find Tag2index')
 
+        return self
+
 
 
 

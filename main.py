@@ -82,7 +82,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     return acc_train, acc_test
 
-def min_min_attack(train_graphs, model, noise, tags, rounds):
+def min_min_attack(args, train_graphs, model, noise, tags, rounds):
     def flip(bnoise, idx):
         if bnoise[idx]==1:
             bnoise[idx] = 0
@@ -190,21 +190,15 @@ def main():
     eph = 1
     while condition:
         nsd_train_graphs = copy.deepcopy(train_graphs)
-        for x in nsd_train_graphs:
-            if x.node_features is None:
-                print('Error')
         for idx in range(len(train_graphs)):
             nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx])
-        for x in nsd_train_graphs:
-            if x is None:
-                print('Error: NOOOOOOOO!')
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
 
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(train_graphs, model, noise, df_tags, 20)
+            min_min_attack(args, train_graphs, model, noise, df_tags, 20)
             pbar.set_description('Noise Training...')
 
         acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, eph)
@@ -213,8 +207,8 @@ def main():
         if acc_train > 0.99:
             condition = False
 
-    poisoned_train_graphs = [train_graphs[i].add_noise(noise[i], df_tags[i]) for i in range(len(train_graphs))]
-    train_graphs = poisoned_train_graphs
+    for idx in range(len(train_graphs)):
+        train_graphs[idx].add_noise(noise[idx], df_tags[idx])
     model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
 
     #########################################
