@@ -82,7 +82,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     return acc_train, acc_test
 
-def min_min_attack(args, train_graphs, model, noise, tags, rounds):
+def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     def flip(bnoise, idx):
         if bnoise[idx]==1:
             bnoise[idx] = 0
@@ -198,7 +198,7 @@ def main():
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(args, train_graphs, model, noise, df_tags, 20)
+            min_min_attack(args, device, train_graphs, model, noise, df_tags, 20)
             pbar.set_description('Noise Training...')
 
         acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, eph)
