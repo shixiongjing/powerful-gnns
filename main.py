@@ -194,7 +194,7 @@ def main():
             print('Error')
         nsd_train_graphs = [nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx]) for idx in range(len(train_graphs))]
         scheduler.step()
-        train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
+        train(args, model, device, train_graphs, optimizer, eph, 30)
 
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
