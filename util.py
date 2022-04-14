@@ -30,18 +30,20 @@ class S2VGraph(object):
         # add neighbors
         self.neighbors.append([])
         connections = (x for x in range(0, len(adj_noise)) if adj_noise[x]>0)
-        degree_list.append(0)
+        degree_list = []
         new_edges = []
         for n in connections:
             self.g.add_edge(node_id, n)
             self.neighbors[node_id].append(n)
             self.neighbors[n].append(node_id)
-            degree_list[node_id]+=1
-            degree_list[n]+=1
-        self.max_neighbor = max(degree_list)
+
         edges = [list(pair) for pair in self.g.edges()]
         edges.extend([[i, j] for j, i in edges])
         self.edge_mat = torch.LongTensor(edges).transpose(0,1)
+
+        for i in range(len(self.g)):
+            degree_list.append(len(g.neighbors[i]))
+        self.max_neighbor = max(degree_list)
         self.node_tags.append(tag)
 
 
