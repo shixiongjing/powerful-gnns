@@ -97,10 +97,11 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     batch_graph = [train_graphs[idx] for idx in selected_idx]
     batch_noise = [noise[idx] for idx in selected_idx]
     batch_tags = [tags[idx] for idx in selected_idx]
-    for _ in range(rounds):
-        for i in range(len(batch_graph)):
-            # For each graph, do numeric gradient
-            prev_loss = float('inf')
+    
+    for i in range(len(batch_graph)):
+        # For each graph, do numeric gradient
+        prev_loss = float('inf')
+        for _ in range(rounds):
             temp_graph = copy.deepcopy(batch_graph[i])
             cur_tag = batch_tags[i]
             cur_noise = batch_noise[i]
