@@ -23,6 +23,29 @@ class S2VGraph(object):
 
         self.max_neighbor = 0
 
+        def add_noise(adj_noise, tag):
+            node_id = len(self.g)
+            self.g.add_node(node_id)
+
+            # add neighbors
+            self.neighbors.append([])
+            connections = (x for x in range(0, len(adj_noise)) if adj_noise[x]>0)
+            degree_list.append(0)
+            new_edges = []
+            for n in connections:
+                self.g.add_edge(node_id, n)
+                self.neighbors[node_id].append(n)
+                self.neighbors[n].append(node_id)
+                degree_list[node_id]+=1
+                degree_list[n]+=1
+            self.max_neighbor = max(degree_list)
+            edges = [list(pair) for pair in self.g.edges()]
+            edges.extend([[i, j] for j, i in edges])
+            self.edge_mat = torch.LongTensor(edges).transpose(0,1)
+            self.node_tags.append(tag)
+
+
+
 
 def load_data(dataset, degree_as_tag):
     '''
@@ -120,10 +143,11 @@ def load_data(dataset, degree_as_tag):
 
     print('# classes: %d' % len(label_dict))
     print('# maximum node tag: %d' % len(tagset))
+    print('Tag Set:'+str(tagset))
 
     print("# data: %d" % len(g_list))
 
-    return g_list, len(label_dict)
+    return g_list, len(label_dict), tagset
 
 def separate_data(graph_list, seed, fold_idx):
     assert 0 <= fold_idx and fold_idx < 10, "fold_idx must be from 0 to 9."

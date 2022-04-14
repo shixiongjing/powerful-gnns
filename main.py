@@ -9,13 +9,16 @@ from tqdm import tqdm
 
 from util import load_data, separate_data
 from models.graphcnn import GraphCNN
+import copy
 
 criterion = nn.CrossEntropyLoss()
 
-def train(args, model, device, train_graphs, optimizer, epoch):
+def train(args, model, device, train_graphs, optimizer, epoch, spec_iter=0):
     model.train()
 
     total_iters = args.iters_per_epoch
+    if spec_iter > 0:
+        total_iters = spec_iter
     pbar = tqdm(range(total_iters), unit='batch')
 
     loss_accum = 0
@@ -79,6 +82,40 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     return acc_train, acc_test
 
+def min_min_attack(train_graphs, model, noise, tags, rounds):
+    def flip(bnoise, idx):
+        if bnoise[idx]==1:
+            bnoise[idx] = 0
+        elif bnoise[idx]==0:
+            bnoise[idx] = 1
+        else:
+            print('Error: non binary noise.')
+
+    model.eval()
+    
+    selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
+    batch_graph = [train_graphs[idx] for idx in selected_idx]
+    batch_noise = [noise[idx] for idx in selected_idx]
+    batch_tags = [tags[idx] for idx in selected_idx]
+    for _ in range(rounds):
+        for i in range(len(batch_graph)):
+            # For each graph, do numeric gradient
+            prev_loss = float('inf')
+            temp_graph = copy.deepcopy(batch_graph[i])
+            cur_tag = batch_tag[i]
+            cur_noise = batch_noise[i]
+            for dim in len(temp_graph.g):
+                flip(cur_noise, dim)
+                new_graph = [temp_graph.add_noise(cur_noise, cur_tag)]
+                output = model(new_graph)
+                labels = torch.LongTensor([graph.label for graph in new_graph]).to(device)
+                # compute loss
+                loss = criterion(output, labels)
+                # if worse, flip back
+                if loss > prev_loss:
+                    flip(cur_noise, dim)
+    return 0
+
 def main():
     # Training settings
     # Note: Hyper-parameters need to be tuned in order to obtain results reported in the paper.
@@ -126,7 +163,7 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
 
-    graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
+    graphs, num_classes, tagset = load_data(args.dataset, args.degree_as_tag)
 
     ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
     train_graphs, test_graphs = separate_data(graphs, args.seed, args.fold_idx)
@@ -135,6 +172,49 @@ def main():
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
+
+    #########################################
+    #
+    #
+    # Genereate Noise
+    #
+    #
+    #########################################
+
+    condition = True
+    noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
+
+    df_tags = [graph.label for graph in train_graphs]
+    tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
+    best_tag = [-1]*len(train_graphs)
+    while condition:
+        nsd_train_graphs = copy.deepcopy(train_graphs)
+        nsd_train_graphs = [nsd_train_graphs[idx].add_noise()]
+        scheduler.step()
+        train(args, model, device, nsd_train_graphs, optimizer, epoch, 30)
+
+
+        pbar = tqdm(range(args.iters_per_epoch), unit='batch')
+        for pos in pbar:
+            min_min_attack(train_graphs, model, noise, df_tags, 20)
+            pbar.set_description('Noise Training...')
+
+        acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, epoch)
+        print("Train Accuracy {:2.2%}, Test Accuracy {:2.2%}".format(acc_train, acc_test))
+        if acc_train > 0.99:
+            condition = False
+
+    poisoned_train_graphs = [train_graphs[i].add_noise(noise[i], df_tags[i]) for i in range(len(train_graphs))]
+    train_graphs = poisoned_train_graphs
+    #########################################
+    #
+    #
+    # Finish Noise Generation
+    #
+    #
+    #########################################
+
+
 
 
     for epoch in range(1, args.epochs + 1):
