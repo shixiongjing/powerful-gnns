@@ -42,7 +42,7 @@ class S2VGraph(object):
         self.edge_mat = torch.LongTensor(edges).transpose(0,1)
 
         for i in range(len(self.g)):
-            degree_list.append(len(g.neighbors[i]))
+            degree_list.append(len(self.neighbors[i]))
         self.max_neighbor = max(degree_list)
         self.node_tags.append(tag)
 
