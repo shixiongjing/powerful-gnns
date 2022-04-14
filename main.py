@@ -185,7 +185,7 @@ def main():
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
 
     df_tags = [graph.label for graph in train_graphs]
-    tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
+    #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
     best_tag = [-1]*len(train_graphs)
     while condition:
         nsd_train_graphs = copy.deepcopy(train_graphs)
