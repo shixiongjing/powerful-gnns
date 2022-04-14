@@ -5,6 +5,7 @@ import torch
 from sklearn.model_selection import StratifiedKFold
 
 class S2VGraph(object):
+    tag2index = None
     def __init__(self, g, label, node_tags=None, node_features=None):
         '''
             g: a networkx graph
@@ -45,6 +46,10 @@ class S2VGraph(object):
             degree_list.append(len(self.neighbors[i]))
         self.max_neighbor = max(degree_list)
         self.node_tags.append(tag)
+
+        if tag2index:
+            self.node_features = torch.zeros(len(self.node_tags), len(tag2index))
+            self.node_features[range(len(self.node_tags)), [tag2index[tag] for tag in self.node_tags]] = 1
 
 
 
@@ -137,6 +142,8 @@ def load_data(dataset, degree_as_tag):
 
     tagset = list(tagset)
     tag2index = {tagset[i]:i for i in range(len(tagset))}
+
+    S2VGraph.tag2index = tag2index
 
     for g in g_list:
         g.node_features = torch.zeros(len(g.node_tags), len(tagset))
