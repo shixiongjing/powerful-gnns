@@ -131,6 +131,7 @@ def autorun(args):
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
 
+    print(args.dataset, str(args.degree_as_tag))
     graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
 
     ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
