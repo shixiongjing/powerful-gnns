@@ -194,10 +194,9 @@ def main():
     #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
     best_tag = [-1]*len(train_graphs)
     eph = 1
+    nsd_train_graphs = copy.deepcopy(train_graphs)
     while condition:
-        nsd_train_graphs = copy.deepcopy(train_graphs)
-        for idx in range(len(train_graphs)):
-            nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx])
+        
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
 
@@ -207,7 +206,10 @@ def main():
             min_min_attack(args, device, train_graphs, model, noise, df_tags, 20)
             pbar.set_description('Noise Training...')
 
-        acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, eph)
+        nsd_train_graphs = copy.deepcopy(train_graphs)
+        for idx in range(len(train_graphs)):
+            nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx])
+        acc_train, acc_test = test(args, model, device, nsd_train_graphs, test_graphs, eph)
         print("Train Accuracy {:2.2%}, Test Accuracy {:2.2%}".format(acc_train, acc_test))
         eph += 1
         if acc_train > 0.99:
