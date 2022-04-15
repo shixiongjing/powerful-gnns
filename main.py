@@ -97,7 +97,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     batch_graph = [train_graphs[idx] for idx in selected_idx]
     batch_noise = [noise[idx] for idx in selected_idx]
     batch_tags = [tags[idx] for idx in selected_idx]
-    best_loss = float('inf')*len(selected_idx)
+    best_loss = [float('inf')]*len(selected_idx)
     
     for _ in range(rounds):
         for i in range(len(batch_graph)):
