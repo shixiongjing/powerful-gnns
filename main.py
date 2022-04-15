@@ -123,6 +123,40 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
                 continue
     return 0
 
+def autorun(args):
+    #set up seeds and gpu device
+    torch.manual_seed(0)
+    np.random.seed(0)    
+    device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(0)
+
+    graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
+
+    ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
+    train_graphs, test_graphs = separate_data(graphs, args.seed, args.fold_idx)
+
+    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
+
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
+
+
+    for epoch in range(1, args.epochs + 1):
+        scheduler.step()
+
+        avg_loss = train(args, model, device, train_graphs, optimizer, epoch)
+        acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, epoch)
+
+        if not args.filename == "":
+            with open(args.filename, 'w') as f:
+                f.write("%f %f %f" % (avg_loss, acc_train, acc_test))
+                f.write("\n")
+        print("")
+
+        print(model.eps)
+    
+
 def main():
     # Training settings
     # Note: Hyper-parameters need to be tuned in order to obtain results reported in the paper.
@@ -161,7 +195,13 @@ def main():
     					help='let the input node features be the degree of nodes (heuristics for unlabeled graph)')
     parser.add_argument('--filename', type = str, default = "",
                                         help='output file')
+    parser.add_argument('--clean', action="store_true",
+                                        help='whether to do a clean run without any poisoning')
     args = parser.parse_args()
+
+    if args.clean:
+        autorun(args)
+        return
 
     #set up seeds and gpu device
     torch.manual_seed(0)
