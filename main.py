@@ -195,13 +195,13 @@ def main():
     					help='let the input node features be the degree of nodes (heuristics for unlabeled graph)')
     parser.add_argument('--filename', type = str, default = "",
                                         help='output file')
-    parser.add_argument('--clean', action="store_true",
+    parser.add_argument('--cleanrun', action="store_true",
                                         help='whether to do a clean run without any poisoning')
     args = parser.parse_args()
 
-    if args.clean:
+    if args.cleanrun:
         autorun(args)
-        return
+        return 0
 
     #set up seeds and gpu device
     torch.manual_seed(0)
