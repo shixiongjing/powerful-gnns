@@ -161,7 +161,7 @@ def load_data(dataset, degree_as_tag):
     print('# classes: %d' % len(label_dict))
     print('# maximum node tag: %d' % len(tagset))
     print('Tag Set:'+str(tagset))
-    assert len(tag_count) == len(tag_set)
+    assert len(tag_count) == len(tagset)
 
     print("# data: %d" % len(g_list))
 
