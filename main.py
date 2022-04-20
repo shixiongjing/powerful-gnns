@@ -288,6 +288,7 @@ def main():
         print("")
 
         print(model.eps)
+    print('noise generation round: ' + str(eph))
     
 
 if __name__ == '__main__':
