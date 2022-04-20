@@ -210,7 +210,7 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
 
-    graphs, num_classes, tagset = load_data(args.dataset, args.degree_as_tag)
+    graphs, num_classes, tag_count = load_data(args.dataset, args.degree_as_tag)
 
     ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
     train_graphs, test_graphs = separate_data(graphs, args.seed, args.fold_idx)
@@ -228,10 +228,14 @@ def main():
     #
     #########################################
 
+    # Find tags
+    A = np.array(tag_count)
+    selected_tags = np.argpartition(A, num_classes)
+
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
 
-    df_tags = [3 if graph.label == 0 else 4 for graph in train_graphs]
+    df_tags = [selected_tags[graph.label] for graph in train_graphs]
     #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
     best_tag = [-1]*len(train_graphs)
     eph = 1

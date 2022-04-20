@@ -69,6 +69,7 @@ def load_data(dataset, degree_as_tag):
     g_list = []
     label_dict = {}
     feat_dict = {}
+    tag_count = []
 
     with open('dataset/%s/%s.txt' % (dataset, dataset), 'r') as f:
         n_g = int(f.readline().strip())
@@ -95,7 +96,10 @@ def load_data(dataset, degree_as_tag):
                 if not row[0] in feat_dict:
                     mapped = len(feat_dict)
                     feat_dict[row[0]] = mapped
+                    tag_count.append(0)
                 node_tags.append(feat_dict[row[0]])
+                tag_count[feat_dict[row[0]]] += 1
+
 
                 if tmp > len(row):
                     node_features.append(attr)
@@ -157,10 +161,11 @@ def load_data(dataset, degree_as_tag):
     print('# classes: %d' % len(label_dict))
     print('# maximum node tag: %d' % len(tagset))
     print('Tag Set:'+str(tagset))
+    assert len(tag_count) == len(tag_set)
 
     print("# data: %d" % len(g_list))
 
-    return g_list, len(label_dict), tagset
+    return g_list, len(label_dict), tag_count
 
 def separate_data(graph_list, seed, fold_idx):
     assert 0 <= fold_idx and fold_idx < 10, "fold_idx must be from 0 to 9."
