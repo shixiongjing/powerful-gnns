@@ -209,8 +209,6 @@ def main():
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
-        print('===============Using CUDA=================')
-    print(str(device))
 
     graphs, num_classes, tag_count = load_data(args.dataset, args.degree_as_tag)
 
