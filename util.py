@@ -174,7 +174,7 @@ def write_data(args, graph_list, graph_list_test):
             f.write("\n %d %d" % (len(graph.g), graph.label))
             for i in range(len(graph.g)): 
                 string_ints = [str(int) for int in graph.neighbors[i]]
-                f.write("\n %d %d %s" % (graph.node_tags[i], len(graph.neighbors[i])
+                f.write("\n %d %d %s" % (graph.node_tags[i], len(graph.neighbors[i]),
                                             " ".join(string_ints)))
 
         f.write('\n')
