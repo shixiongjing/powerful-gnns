@@ -7,7 +7,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from util import load_data, separate_data
+from util import load_data, write_data, separate_data
 from models.graphcnn import GraphCNN
 import copy
 
@@ -197,6 +197,10 @@ def main():
                                         help='output file')
     parser.add_argument('--cleanrun', action="store_true",
                                         help='whether to do a clean run without any poisoning')
+    parser.add_argument('--writepoison', type=str, default="", help='filename for poisoned data')
+    parser.add_argument('--lock_noise_gen', action="store_true",
+                                        help='Whether to lock at noise gen')
+    
     args = parser.parse_args()
 
     if args.cleanrun:
@@ -241,7 +245,10 @@ def main():
     eph = 1
     nsd_train_graphs = copy.deepcopy(train_graphs)
     while condition:
-        
+        if args.lock_noise_gen and eph % 6 == 5:
+            model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
+            optimizer = optim.Adam(model.parameters(), lr=args.lr)
+            scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
         scheduler.step()
         train(args, model, device, nsd_train_graphs, optimizer, eph, 30)
 
@@ -262,7 +269,10 @@ def main():
 
     for idx in range(len(train_graphs)):
         train_graphs[idx].add_noise(noise[idx], df_tags[idx])
-    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
+    if not args.writepoison == "":
+        write_data(args, train_graphs, test_graphs)
+
+    
 
     #########################################
     #
@@ -272,7 +282,9 @@ def main():
     #
     #########################################
 
-
+    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
 
 
     for epoch in range(1, args.epochs + 1):
@@ -282,8 +294,9 @@ def main():
         acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, epoch)
 
         if not args.filename == "":
-            with open(args.filename, 'w') as f:
-                f.write("%f %f %f" % (avg_loss, acc_train, acc_test))
+            with open(args.filename, 'a') as f:
+                f.write("%s %d %s %f %s %f %s %f" % ('epoch', epoch, 'avg loss', avg_loss, 
+                                'acc train', acc_train, 'acc test', acc_test))
                 f.write("\n")
         print("")
 

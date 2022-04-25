@@ -167,6 +167,18 @@ def load_data(dataset, degree_as_tag):
 
     return g_list, len(label_dict), tag_count
 
+def write_data(args, graph_list, graph_list_test):
+    with open('dataset/%s/%s.txt' % ('poison', args.dataset+args.write_data), 'w') as f:
+        f.write(str(len(graph_list)))
+        for graph in graph_list:
+            f.write("\n %d %d" % (len(graph.g), graph.label))
+            for i in range(len(graph.g)): 
+                string_ints = [str(int) for int in graph.neighbors[i]]
+                f.write("\n %d %d %s" % (graph.node_tags[i], len(graph.neighbors[i])
+                                            " ".join(string_ints)))
+
+        f.write('\n')
+
 def separate_data(graph_list, seed, fold_idx):
     assert 0 <= fold_idx and fold_idx < 10, "fold_idx must be from 0 to 9."
     skf = StratifiedKFold(n_splits=10, shuffle = True, random_state = seed)
