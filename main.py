@@ -120,6 +120,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
                     best_loss[i] = loss
                     valley=False
             if valley:
+                print(str(cur_noise) + '\n tag: '+cur_tag)
                 continue
     return 0
 
@@ -155,6 +156,26 @@ def autorun(args):
         print("")
 
         print(model.eps)
+
+def testrun(args):
+    graphs, num_classes, tag_count = load_data(args.dataset, args.degree_as_tag)
+
+    ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
+    train_graphs, test_graphs = separate_data(graphs, args.seed, args.fold_idx)
+
+    A = np.array(tag_count)
+    selected_tags = np.argpartition(A, num_classes)
+
+    condition = True
+    noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
+
+    df_tags = [selected_tags[graph.label] for graph in train_graphs]
+    nsd_train_graphs = copy.deepcopy(train_graphs)
+    for idx in range(len(train_graphs)):
+        print(len(train_graphs[idx].g))
+        nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx])
+        print(len(train_graphs[idx].g))
+        print(len(nsd_train_graphs[idx].g))
     
 
 def main():
@@ -197,10 +218,15 @@ def main():
                                         help='output file')
     parser.add_argument('--cleanrun', action="store_true",
                                         help='whether to do a clean run without any poisoning')
+    parser.add_argument('--testmode', action="store_true",
+                                        help='whether to do a test with graph modification')
     args = parser.parse_args()
 
     if args.cleanrun:
         autorun(args)
+        return 0
+    elif args.testmode:
+        testrun(args)
         return 0
 
     #set up seeds and gpu device
@@ -282,7 +308,7 @@ def main():
         acc_train, acc_test = test(args, model, device, train_graphs, test_graphs, epoch)
 
         if not args.filename == "":
-            with open(args.filename, 'w') as f:
+            with open(args.filename, 'a+') as f:
                 f.write("%f %f %f" % (avg_loss, acc_train, acc_test))
                 f.write("\n")
         print("")
