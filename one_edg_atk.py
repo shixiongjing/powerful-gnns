@@ -137,7 +137,7 @@ def one_edge_attack(args, device, train_graphs, model, noise, tags, rounds):
         cur_tag = batch_tags[i]
         temp_noise = 0
         best_edge = 0
-        for dim in range(len(temp_graph.g)):
+        for dim in range(len(batch_graph[i].g)):
             temp_graph = copy.deepcopy(batch_graph[i])
             new_graph = [temp_graph.add_single_edge_noise(dim, cur_tag)]
             output = model(new_graph)
