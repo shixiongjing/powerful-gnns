@@ -292,7 +292,7 @@ def main():
 
         nsd_train_graphs = copy.deepcopy(train_graphs)
         for idx in range(len(train_graphs)):
-            nsd_train_graphs[idx].add_noise(noise[idx], df_tags[idx])
+            nsd_train_graphs[idx].add_single_edge_noise(noise[idx], df_tags[idx])
         acc_train, acc_test = test(args, model, device, nsd_train_graphs, test_graphs, eph)
         print("Train Accuracy {:2.2%}, Test Accuracy {:2.2%}".format(acc_train, acc_test))
         eph += 1
