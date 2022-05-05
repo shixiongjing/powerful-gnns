@@ -104,9 +104,9 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
             # For each graph, do numeric gradient
             cur_tag = batch_tags[i]
             cur_noise = batch_noise[i]
-            temp_graph = copy.deepcopy(batch_graph[i])
             valley=True
-            for dim in range(len(temp_graph.g)):
+            for dim in range(len(batch_graph[i].g)):
+                temp_graph = copy.deepcopy(batch_graph[i])
                 flip(cur_noise, dim)
                 new_graph = [temp_graph.add_noise(cur_noise, cur_tag)]
                 output = model(new_graph)
@@ -200,6 +200,8 @@ def main():
     parser.add_argument('--writepoison', type=str, default="", help='filename for poisoned data')
     parser.add_argument('--lock_noise_gen', action="store_true",
                                         help='Whether to lock at noise gen')
+    parser.add_argument('--print_graph_info', type = str, default = "",
+                                        help='output file')
     
     args = parser.parse_args()
 
@@ -266,6 +268,15 @@ def main():
         eph += 1
         if acc_train > 0.99:
             condition = False
+
+    if not args.print_graph_info == "":
+        with open(args.print_graph_info, 'w') as f:
+            for idx in range(len(train_graphs)):
+            G = train_graphs[idx].g
+            f.write("%s %f" % ('average degree:', sum(G.degree().values())/float(len(G))))
+            f.write("%s %f" % ('new degree:', sum(noise[idx])))
+                
+
 
     for idx in range(len(train_graphs)):
         train_graphs[idx].add_noise(noise[idx], df_tags[idx])
