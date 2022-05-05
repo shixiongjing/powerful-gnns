@@ -287,7 +287,7 @@ def main():
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(args, device, train_graphs, model, noise, df_tags, 20)
+            one_edge_attack(args, device, train_graphs, model, noise, df_tags, 20)
             pbar.set_description('Noise Training...')
 
         nsd_train_graphs = copy.deepcopy(train_graphs)
