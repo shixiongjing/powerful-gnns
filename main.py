@@ -276,11 +276,12 @@ def main():
                 f.write("%s %d \n" % ('node number:', len(G)))
                 f.write("%s %f \n" % ('average degree:', sum(dict(G.degree()).values())/float(len(G))))
                 f.write("%s %f \n" % ('new degree:', sum(noise[idx])))
-                assert all(x <= 1 for x in noise[idx])
+
                 
 
 
     for idx in range(len(train_graphs)):
+        assert all(x <= 1 for x in noise[idx])
         train_graphs[idx].add_noise(noise[idx], df_tags[idx])
     if not args.writepoison == "":
         write_data(args, train_graphs, test_graphs)
