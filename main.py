@@ -273,8 +273,9 @@ def main():
         with open(args.print_graph_info, 'w') as f:
             for idx in range(len(train_graphs)):
                 G = train_graphs[idx].g
-                f.write("%s %f" % ('average degree:', sum(dict(G.degree()).values())/float(len(G))))
-                f.write("%s %f" % ('new degree:', sum(noise[idx])))
+                f.write("%s %d \n" % ('node number:', len(G)))
+                f.write("%s %f \n" % ('average degree:', sum(dict(G.degree()).values())/float(len(G))))
+                f.write("%s %f \n" % ('new degree:', sum(noise[idx])))
                 
 
 
