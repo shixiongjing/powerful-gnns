@@ -105,7 +105,7 @@ class GraphCNN(nn.Module):
 
         Adj_block = torch.sparse.FloatTensor(Adj_block_idx, Adj_block_elem, torch.Size([start_idx[-1],start_idx[-1]]))
 
-        return Adj_block.to(self.device)
+        return Adj_block.to_dense().to(self.device)
 
 
     def __preprocess_graphpool(self, batch_graph):
@@ -176,10 +176,10 @@ class GraphCNN(nn.Module):
             pooled = self.maxpool(h, padded_neighbor_list)
         else:
             #If sum or average pooling
-            pooled = torch.spmm(Adj_block, h)
+            pooled = torch.mm(Adj_block, h)
             if self.neighbor_pooling_type == "average":
                 #If average pooling
-                degree = torch.spmm(Adj_block, torch.ones((Adj_block.shape[0], 1)).to(self.device))
+                degree = torch.mm(Adj_block, torch.ones((Adj_block.shape[0], 1)).to(self.device))
                 pooled = pooled/degree
 
         #representation of neighboring and center nodes 
@@ -192,14 +192,14 @@ class GraphCNN(nn.Module):
         return h
 
 
-    def forward(self, batch_graph):
-        X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(self.device)
-        graph_pool = self.__preprocess_graphpool(batch_graph)
+    def forward(self, graph_pool, X_concat, Adj_block):
+        # X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(self.device)
+        # graph_pool = self.__preprocess_graphpool(batch_graph)
 
-        if self.neighbor_pooling_type == "max":
-            padded_neighbor_list = self.__preprocess_neighbors_maxpool(batch_graph)
-        else:
-            Adj_block = self.__preprocess_neighbors_sumavepool(batch_graph)
+        # if self.neighbor_pooling_type == "max":
+        #     padded_neighbor_list = self.__preprocess_neighbors_maxpool(batch_graph)
+        # else:
+        #     Adj_block = self.__preprocess_neighbors_sumavepool(batch_graph)
 
         #list of hidden representation at each layer (including input)
         hidden_rep = [X_concat]
