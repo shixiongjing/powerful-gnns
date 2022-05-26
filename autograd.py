@@ -224,6 +224,7 @@ def main():
     #
     #
     #########################################
+    min_min_attack(train_graphs)
 
     # Find tags
     A = np.array(tag_count)
