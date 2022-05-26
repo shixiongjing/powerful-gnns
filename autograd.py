@@ -82,7 +82,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     return acc_train, acc_test
 
-def min_min_attack(train_graphs, model):
+def min_min_attack(train_graphs, model, args):
     selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
     batch_graph = [train_graphs[idx] for idx in selected_idx]
 
@@ -224,7 +224,7 @@ def main():
     #
     #
     #########################################
-    min_min_attack(train_graphs, model)
+    min_min_attack(train_graphs, model, args)
     quit()
 
     # Find tags
