@@ -112,6 +112,7 @@ def min_min_attack(train_graphs, model, args):
     X.retain_grad()
     A.retain_grad()
     loss.backward()
+    print(A.grad.data.sign())
 
     print('Yay!!!')
              
