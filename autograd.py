@@ -87,7 +87,7 @@ def min_min_attack(train_graphs, model, args):
     batch_graph = [train_graphs[idx] for idx in selected_idx]
 
 
-    X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(self.device)
+    X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(model.device)
     graph_pool = model.__preprocess_graphpool(batch_graph)
 
     if model.neighbor_pooling_type == "max":
