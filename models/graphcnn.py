@@ -83,7 +83,7 @@ class GraphCNN(nn.Module):
         return torch.LongTensor(padded_neighbor_list)
 
 
-    def __preprocess_neighbors_sumavepool(self, batch_graph):
+    def preprocess_neighbors_sumavepool(self, batch_graph):
         ###create block diagonal sparse matrix
 
         edge_mat_list = []
@@ -108,7 +108,7 @@ class GraphCNN(nn.Module):
         return Adj_block.to_dense().to(self.device)
 
 
-    def __preprocess_graphpool(self, batch_graph):
+    def preprocess_graphpool(self, batch_graph):
         ###create sum or average pooling sparse matrix over entire nodes in each graph (num graphs x num nodes)
         
         start_idx = [0]
