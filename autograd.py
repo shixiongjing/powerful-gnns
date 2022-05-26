@@ -106,7 +106,7 @@ def min_min_attack(train_graphs, model, args):
     model.zero_grad()
     
     output = model(graph_pool, X, A)
-    labels = torch.LongTensor([graph.label for graph in new_graph]).to(device)
+    labels = torch.LongTensor([graph.label for graph in batch_graph]).to(device)
     # compute loss
     loss = criterion(output, labels)
     perturb_img.retain_grad()
