@@ -11,6 +11,8 @@ from util import load_data, write_data, separate_data
 from models.graphcnn import GraphCNN
 import copy
 
+from torch.autograd import Variable
+
 criterion = nn.CrossEntropyLoss()
 
 def train(args, model, device, train_graphs, optimizer, epoch, spec_iter=0):
