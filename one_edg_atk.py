@@ -298,6 +298,7 @@ def main():
         eph += 1
         if acc_train > 0.99:
             condition = False
+        break
 
     for idx in range(len(train_graphs)):
         train_graphs[idx].add_single_edge_noise(noise[idx], df_tags[idx])

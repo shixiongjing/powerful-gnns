@@ -123,7 +123,7 @@ def min_min_attack(train_graphs, model, args):
     loss = criterion(output, labels)
     A.retain_grad()
     loss.backward()
-    print(A.grad.data.sign())
+    print(A.grad.data)
 
     print('Yay!!!')
              
@@ -240,7 +240,7 @@ def main():
     #
     #########################################
     min_min_attack(train_graphs, model, args)
-    quit()
+    
 
     # Find tags
     A = np.array(tag_count)
@@ -254,6 +254,8 @@ def main():
     best_tag = [-1]*len(train_graphs)
     eph = 1
     nsd_train_graphs = copy.deepcopy(train_graphs)
+    for idx in range(len(train_graphs)):
+        nsd_train_graphs[idx].add_single_edge_noise(0, df_tags[idx])
     while condition:
         if args.lock_noise_gen and eph % 6 == 5:
             model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
