@@ -112,7 +112,6 @@ def min_min_attack(train_graphs, model, args):
 
     
     A = Variable(Adj_block, requires_grad=True)
-    G = Variable(graph_pool, requires_grad=True)
     
     opt = optim.Adam(model.parameters(), lr=args.lr)
     opt.zero_grad()
@@ -122,7 +121,6 @@ def min_min_attack(train_graphs, model, args):
     labels = torch.LongTensor([graph.label for graph in batch_graph]).to(model.device)
     # compute loss
     loss = criterion(output, labels)
-    G.retain_grad()
     A.retain_grad()
     loss.backward()
     print(A.grad.data.sign())
