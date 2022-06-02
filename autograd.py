@@ -117,7 +117,7 @@ def min_min_attack(train_graphs, model, args):
     opt.zero_grad()
     model.zero_grad()
     
-    output = model(G, X_concat, A)
+    output = model(graph_pool, X_concat, A)
     labels = torch.LongTensor([graph.label for graph in batch_graph]).to(model.device)
     # compute loss
     loss = criterion(output, labels)
