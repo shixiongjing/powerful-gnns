@@ -91,6 +91,8 @@ class GraphCNN(nn.Module):
         for i, graph in enumerate(batch_graph):
             start_idx.append(start_idx[i] + len(graph.g))
             edge_mat_list.append(graph.edge_mat + start_idx[i])
+            print('edge_mat_list')
+            print(edge_mat_list)
         Adj_block_idx = torch.cat(edge_mat_list, 1)
         Adj_block_elem = torch.ones(Adj_block_idx.shape[1])
 
