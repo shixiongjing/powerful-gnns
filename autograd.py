@@ -85,6 +85,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
     return acc_train, acc_test
 
 def min_min_attack(train_graphs, model, args):
+    model.eval()
     selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
     batch_graph = [train_graphs[idx] for idx in selected_idx]
 
