@@ -91,8 +91,6 @@ class GraphCNN(nn.Module):
         for i, graph in enumerate(batch_graph):
             start_idx.append(start_idx[i] + len(graph.g))
             edge_mat_list.append(graph.edge_mat + start_idx[i])
-            print(graph.edge_mat)
-            print(edge_mat_list)
         Adj_block_idx = torch.cat(edge_mat_list, 1)
         Adj_block_elem = torch.ones(Adj_block_idx.shape[1])
 
@@ -106,7 +104,7 @@ class GraphCNN(nn.Module):
             Adj_block_elem = torch.cat([Adj_block_elem, elem], 0)
 
         Adj_block = torch.sparse.FloatTensor(Adj_block_idx, Adj_block_elem, torch.Size([start_idx[-1],start_idx[-1]]))
-
+        print(Adj_block)
         return Adj_block.to_dense().to(self.device)
 
 

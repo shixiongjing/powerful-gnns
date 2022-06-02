@@ -15,6 +15,17 @@ from torch.autograd import Variable
 
 criterion = nn.CrossEntropyLoss()
 
+def prep_graphs(batch_graph, model):
+    X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(model.device)
+    graph_pool = model.preprocess_graphpool(batch_graph)
+
+    if model.neighbor_pooling_type == "max":
+        padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
+    else:
+        Adj_block = model.preprocess_neighbors_sumavepool(batch_graph)
+    return graph_pool, X_concat, Adj_block
+
+
 def train(args, model, device, train_graphs, optimizer, epoch, spec_iter=0):
     model.train()
 
@@ -26,9 +37,10 @@ def train(args, model, device, train_graphs, optimizer, epoch, spec_iter=0):
     loss_accum = 0
     for pos in pbar:
         selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
-
         batch_graph = [train_graphs[idx] for idx in selected_idx]
-        output = model(batch_graph)
+
+
+        output = model(*prep_graphs(batch_graph, model))
 
         labels = torch.LongTensor([graph.label for graph in batch_graph]).to(device)
 
@@ -62,7 +74,7 @@ def pass_data_iteratively(model, graphs, minibatch_size = 64):
         sampled_idx = idx[i:i+minibatch_size]
         if len(sampled_idx) == 0:
             continue
-        output.append(model([graphs[j] for j in sampled_idx]).detach())
+        output.append(model(*prep_graphs([graphs[j] for j in sampled_idx], model)).detach())
     return torch.cat(output, 0)
 
 def test(args, model, device, train_graphs, test_graphs, epoch):
@@ -98,19 +110,19 @@ def min_min_attack(train_graphs, model, args):
     else:
         Adj_block = model.preprocess_neighbors_sumavepool(batch_graph)
 
-    X = Variable(X_concat, requires_grad=True)
+    
     A = Variable(Adj_block, requires_grad=True)
-
+    G = Variable(graph_pool, requires_grad=True)
     
     opt = optim.Adam(model.parameters(), lr=args.lr)
     opt.zero_grad()
     model.zero_grad()
     
-    output = model(graph_pool, X, A)
+    output = model(G, X_concat, A)
     labels = torch.LongTensor([graph.label for graph in batch_graph]).to(model.device)
     # compute loss
     loss = criterion(output, labels)
-    X.retain_grad()
+    G.retain_grad()
     A.retain_grad()
     loss.backward()
     print(A.grad.data.sign())
