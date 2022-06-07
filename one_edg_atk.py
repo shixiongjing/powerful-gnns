@@ -227,10 +227,11 @@ def main():
     parser.add_argument('--cleanrun', action="store_true",
                                         help='whether to do a clean run without any poisoning')
     parser.add_argument('--writepoison', type=str, default="", help='filename for poisoned data')
-    parser.add_argument('--lock_noise_gen', action="store_true",
-                                        help='Whether to lock at noise gen')
+    parser.add_argument('--re_init', type=int, default=0,
+                        help='reinitialization of model when training noise')
     parser.add_argument('--search_tag', action="store_true",
                                         help='Whether to lock at noise gen')
+
     
     args = parser.parse_args()
 
@@ -266,7 +267,10 @@ def main():
     # Find tags
     A = np.array(tag_count)
     selected_tags = np.argpartition(A, num_classes)
-    df_tags = [selected_tags[graph.label] for graph in train_graphs]
+    if len(selected_tags) == 1:
+        df_tags = [0]*len(train_graphs)
+    else:
+        df_tags = [selected_tags[graph.label] for graph in train_graphs]
 
     condition = True
     noise = [0]*len(train_graphs) # values exclude self
@@ -277,7 +281,7 @@ def main():
     eph = 1
     nsd_train_graphs = copy.deepcopy(train_graphs)
     while condition:
-        if args.lock_noise_gen and eph % 6 == 5:
+        if args.re_init > 0 and eph % args.re_init == args.re_init - 1:
             model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
             optimizer = optim.Adam(model.parameters(), lr=args.lr)
             scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
