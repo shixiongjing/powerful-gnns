@@ -265,11 +265,11 @@ def main():
     #########################################
 
     # Find tags
-    A = np.array(tag_count)
-    selected_tags = np.argpartition(A, num_classes)
-    if len(selected_tags) == 1:
+    if len(tag_count) == 1:
         df_tags = [0]*len(train_graphs)
     else:
+        A = np.array(tag_count)
+        selected_tags = np.argpartition(A, num_classes)
         df_tags = [selected_tags[graph.label] for graph in train_graphs]
 
     condition = True
