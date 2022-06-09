@@ -248,6 +248,7 @@ def main():
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
     min_min_attack(train_graphs, model, args, noise)
+    quit()
     
 
     df_tags = [selected_tags[graph.label] for graph in train_graphs]
