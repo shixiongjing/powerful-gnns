@@ -108,7 +108,7 @@ def min_min_attack(train_graphs, model, args, noise):
     if model.neighbor_pooling_type == "max":
         padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
     else:
-        Adj_block = model.preprocess_neighbors_sumavepool(batch_graph)
+        Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
 
     
     A = Variable(Adj_block, requires_grad=True)
@@ -125,6 +125,8 @@ def min_min_attack(train_graphs, model, args, noise):
     A.retain_grad()
     loss.backward()
     print(A.grad.data)
+    def find_max(M, low, high):
+        torch.argmax()
 
     print('Yay!!!')
              

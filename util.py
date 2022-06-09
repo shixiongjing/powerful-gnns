@@ -81,6 +81,23 @@ class S2VGraph(object):
 
         return self
 
+    def add_no_edge_noise(self, tag):
+        node_id = len(self.g)
+        self.g.add_node(node_id)
+
+        # add neighbors
+        self.neighbors.append([])
+        
+        self.node_tags.append(tag)
+
+        if S2VGraph.tag2index:
+            self.node_features = torch.zeros(len(self.node_tags), len(S2VGraph.tag2index))
+            self.node_features[range(len(self.node_tags)), [S2VGraph.tag2index[tag] for tag in self.node_tags]] = 1
+        else:
+            print('Error. Fail to find Tag2index')
+
+        return self
+
 
 
 
