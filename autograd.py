@@ -96,7 +96,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     return acc_train, acc_test
 
-def min_min_attack(train_graphs, model, args):
+def min_min_attack(train_graphs, model, args, noise):
     model.eval()
     selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
     batch_graph = [train_graphs[idx] for idx in selected_idx]
@@ -267,7 +267,7 @@ def main():
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(args, device, train_graphs, model, noise, df_tags, 20)
+            min_min_attack(train_graphs, model, args)
             pbar.set_description('Noise Training...')
 
         nsd_train_graphs = copy.deepcopy(train_graphs)
