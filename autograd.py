@@ -112,6 +112,7 @@ def min_min_attack(train_graphs, model, args, noise):
 
     
     A = Variable(Adj_block, requires_grad=True)
+    print(A)
     
     opt = optim.Adam(model.parameters(), lr=args.lr)
     opt.zero_grad()

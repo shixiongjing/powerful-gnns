@@ -112,8 +112,8 @@ class GraphCNN(nn.Module):
             Adj_block_elem = torch.cat([Adj_block_elem, elem], 0)
 
         Adj_block = torch.sparse.FloatTensor(Adj_block_idx, Adj_block_elem, torch.Size([start_idx[-1],start_idx[-1]]))
-        print('Final Adj_block')
-        print(Adj_block)
+        # print('Final Adj_block')
+        # print(Adj_block)
         return Adj_block.to_dense().to(self.device)
 
 
