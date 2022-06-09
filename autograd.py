@@ -239,7 +239,6 @@ def main():
     #
     #
     #########################################
-    min_min_attack(train_graphs, model, args)
     
 
     # Find tags
@@ -248,6 +247,8 @@ def main():
 
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
+    min_min_attack(train_graphs, model, args, noise)
+    
 
     df_tags = [selected_tags[graph.label] for graph in train_graphs]
     #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
@@ -267,7 +268,7 @@ def main():
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(train_graphs, model, args)
+            min_min_attack(train_graphs, model, args, noise)
             pbar.set_description('Noise Training...')
 
         nsd_train_graphs = copy.deepcopy(train_graphs)
