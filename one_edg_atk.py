@@ -276,12 +276,13 @@ def main():
     noise = [0]*len(train_graphs) # values exclude self
 
     
-    #tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
+    # tag_score_dict = [tag:[1000.0]*len(train_graphs) for tag in tagset]
     best_tag = [-1]*len(train_graphs)
     eph = 1
     nsd_train_graphs = copy.deepcopy(train_graphs)
     while condition:
-        if args.re_init > 0 and ((eph-1) % args.re_init == args.re_init - 1):
+        if args.re_init > 0:
+            # and ((eph-1) % args.re_init == args.re_init - 1)
             model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)
             optimizer = optim.Adam(model.parameters(), lr=args.lr)
             scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
