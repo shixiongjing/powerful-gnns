@@ -23,6 +23,8 @@ def prep_graphs(batch_graph, model):
         padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
     else:
         Adj_block, _ = model.preprocess_neighbors_sumavepool(batch_graph)
+        print(Adj_block.size())
+        print(X_concat.size())
     return graph_pool, X_concat, Adj_block
 
 
