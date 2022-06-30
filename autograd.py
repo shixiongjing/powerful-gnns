@@ -127,6 +127,8 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     labels = torch.LongTensor([graph.label for graph in batch_graph]).to(model.device)
     # compute loss
     loss = criterion(output, labels)
+    print(output.size())
+    print(label.size())
     A.retain_grad()
     loss.backward()
     print(A.grad.data)
