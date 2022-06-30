@@ -250,7 +250,8 @@ def main():
 
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
-    min_min_attack(train_graphs, model, args, noise)
+    min_min_attack(args, None, train_graphs, model, noise, None, None)
+    #min_min_attack(train_graphs, model, args, noise)
     quit()
     
 
