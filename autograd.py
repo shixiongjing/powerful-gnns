@@ -292,7 +292,7 @@ def main():
             min_min_attack(args, device, train_graphs, model, noise, None, 1)
             pbar.set_description('Noise Training...')
 
-        #nsd_train_graphs = copy.deepcopy(train_graphs)
+        nsd_train_graphs = copy.deepcopy(train_graphs)
         for idx in range(len(train_graphs)):
             nsd_train_graphs[idx].add_single_edge_noise(noise[idx], df_tags[idx])
         acc_train, acc_test = test(args, model, device, nsd_train_graphs, test_graphs, eph)
