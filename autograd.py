@@ -109,7 +109,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     # else:
     Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
     # (start, end)
-    target_range = zip(start_idx, start_idx[1:] + [len(start_idx)])
+    target_range = list(zip(start_idx, start_idx[1:] + [len(start_idx)]))
     for begin, end in target_range:
     	Adj_block[begin:end, end-1] = 0.1
     	Adj_block[end-1, begin:end] = 0.1
