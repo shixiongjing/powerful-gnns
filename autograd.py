@@ -132,8 +132,10 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     loss.backward()
     print(A.grad.data)
 
-    def find_max(M, low, high):
-        torch.argmax()
+    for begin, end in target_range:
+        x = torch.argmax(A.grad.data[begin:end, end-1])
+        print(x)
+
 
 
     print('Yay!!!')
