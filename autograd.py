@@ -22,7 +22,7 @@ def prep_graphs(batch_graph, model):
     if model.neighbor_pooling_type == "max":
         padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
     else:
-        Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
+        Adj_block, _ = model.preprocess_neighbors_sumavepool(batch_graph)
     return graph_pool, X_concat, Adj_block
 
 
@@ -74,7 +74,8 @@ def pass_data_iteratively(model, graphs, minibatch_size = 64):
         sampled_idx = idx[i:i+minibatch_size]
         if len(sampled_idx) == 0:
             continue
-        output.append(model(*prep_graphs([graphs[j] for j in sampled_idx], model)).detach())
+        op = model(*prep_graphs([graphs[j] for j in sampled_idx], model))
+        output.append(op.detach())
     return torch.cat(output, 0)
 
 def test(args, model, device, train_graphs, test_graphs, epoch):
