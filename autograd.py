@@ -99,7 +99,7 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     model.eval()
     selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
-    #batch_graph = [train_graphs[idx].add_single_edge_noise(1, tags[idx]) for idx in selected_idx]
+    batch_graph = [train_graphs[idx] for idx in selected_idx]
 
     X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(model.device)
     graph_pool = model.preprocess_graphpool(batch_graph)

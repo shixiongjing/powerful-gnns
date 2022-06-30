@@ -54,7 +54,7 @@ class S2VGraph(object):
 
         return self
 
-    def add_full_noise(self, init_weight, tag):
+    def add_full_noise(self, tag):
         node_id = len(self.g)
         self.g.add_node(node_id)
 
