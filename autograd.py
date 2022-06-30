@@ -108,11 +108,13 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     #     padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
     # else:
     Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
-    # (start, end, col)
-    target_range = zip(start_idx, start_idx[1:] + [len(start_idx)], [idx - 1 for idx in start_idx])
-    for begin, end, col in target_range:
-    	Adj_block[begin:end, col] = 0.1
-    	Adj_block[col, begin:end] = 0.1
+    # (start, end)
+    target_range = zip(start_idx, start_idx[1:] + [len(start_idx)])
+    for begin, end in target_range:
+    	print(begin)
+    	Adj_block[begin:end, end-1] = 0.1
+    	Adj_block[end-1, begin:end] = 0.1
+    	Adj_block[end-1, end-1] = 1
 
     
     A = Variable(Adj_block, requires_grad=True)
