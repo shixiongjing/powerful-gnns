@@ -22,7 +22,7 @@ def prep_graphs(batch_graph, model):
     if model.neighbor_pooling_type == "max":
         padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
     else:
-        Adj_block = model.preprocess_neighbors_sumavepool(batch_graph)
+        Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
     return graph_pool, X_concat, Adj_block
 
 
