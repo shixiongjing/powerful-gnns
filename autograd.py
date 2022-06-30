@@ -99,16 +99,20 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     model.eval()
     selected_idx = np.random.permutation(len(train_graphs))[:args.batch_size]
-    batch_graph = [train_graphs[idx] for idx in selected_idx]
-
+    #batch_graph = [train_graphs[idx].add_single_edge_noise(1, tags[idx]) for idx in selected_idx]
 
     X_concat = torch.cat([graph.node_features for graph in batch_graph], 0).to(model.device)
     graph_pool = model.preprocess_graphpool(batch_graph)
 
-    if model.neighbor_pooling_type == "max":
-        padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
-    else:
-        Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
+    # if model.neighbor_pooling_type == "max":
+    #     padded_neighbor_list = model.__preprocess_neighbors_maxpool(batch_graph)
+    # else:
+    Adj_block, start_idx = model.preprocess_neighbors_sumavepool(batch_graph)
+    # (start, end, col)
+    target_range = zip(start_idx, start_idx[1:] + [len(start_idx)], [idx - 1 for idx in start_idx])
+    for begin, end, col in target_range:
+    	Adj_block[begin:end, col] = 0.1
+    	Adj_block[col, begin:end] = 0.1
 
     
     A = Variable(Adj_block, requires_grad=True)
@@ -125,8 +129,10 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     A.retain_grad()
     loss.backward()
     print(A.grad.data)
+
     def find_max(M, low, high):
         torch.argmax()
+
 
     print('Yay!!!')
              
@@ -250,9 +256,6 @@ def main():
 
     condition = True
     noise = [([1]*(len(g.g))) for g in train_graphs] # values exclude self
-    min_min_attack(args, None, train_graphs, model, noise, None, None)
-    #min_min_attack(train_graphs, model, args, noise)
-    quit()
     
 
     df_tags = [selected_tags[graph.label] for graph in train_graphs]
@@ -262,6 +265,12 @@ def main():
     nsd_train_graphs = copy.deepcopy(train_graphs)
     for idx in range(len(train_graphs)):
         nsd_train_graphs[idx].add_single_edge_noise(0, df_tags[idx])
+
+    min_min_attack(args, None, train_graphs, model, noise, None, None)
+    #min_min_attack(train_graphs, model, args, noise)
+    quit()
+
+
     while condition:
         if args.lock_noise_gen and eph % 6 == 5:
             model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim, num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type, args.neighbor_pooling_type, device).to(device)

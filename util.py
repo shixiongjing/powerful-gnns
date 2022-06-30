@@ -54,6 +54,35 @@ class S2VGraph(object):
 
         return self
 
+    def add_full_noise(self, init_weight, tag):
+        node_id = len(self.g)
+        self.g.add_node(node_id)
+
+        # add neighbors
+        self.neighbors.append([])
+        degree_list = []
+        for n in range(0, node_id):
+            self.g.add_edge(node_id, n)
+            self.neighbors[node_id].append(n)
+            self.neighbors[n].append(node_id)
+
+        edges = [list(pair) for pair in self.g.edges()]
+        edges.extend([[i, j] for j, i in edges])
+        self.edge_mat = torch.LongTensor(edges).transpose(0,1)
+
+        for i in range(len(self.g)):
+            degree_list.append(len(self.neighbors[i]))
+        self.max_neighbor = max(degree_list)
+        self.node_tags.append(tag)
+
+        if S2VGraph.tag2index:
+            self.node_features = torch.zeros(len(self.node_tags), len(S2VGraph.tag2index))
+            self.node_features[range(len(self.node_tags)), [S2VGraph.tag2index[tag] for tag in self.node_tags]] = 1
+        else:
+            print('Error. Fail to find Tag2index')
+
+        return self
+
     def add_single_edge_noise(self, target_id, tag):
         node_id = len(self.g)
         self.g.add_node(node_id)
