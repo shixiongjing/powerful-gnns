@@ -213,7 +213,7 @@ class GraphCNN(nn.Module):
         #list of hidden representation at each layer (including input)
         hidden_rep = [X_concat]
         h = X_concat
-        print(X_concat.type())
+        print(h.type())
 
         for layer in range(self.num_layers-1):
             if self.neighbor_pooling_type == "max" and self.learn_eps:
