@@ -141,8 +141,6 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
         x = torch.argmax(A.grad.data[end-1, begin:end], dim=-1)
         noise[selected_idx[i]] = x
         i += 1
-
-    print('Yay!!!')
              
     return 0
 
@@ -271,11 +269,13 @@ def main():
     best_tag = [-1]*len(train_graphs)
     eph = 1
     nsd_train_graphs = copy.deepcopy(train_graphs)
-    for idx in range(len(train_graphs)):
-        nsd_train_graphs[idx].add_single_edge_noise(0, df_tags[idx])
+    
 
-    min_min_attack(args, None, train_graphs, model, noise, None, None)
-    #min_min_attack(train_graphs, model, args, noise)
+    
+    # for idx in range(len(train_graphs)):
+    #     nsd_train_graphs[idx].add_single_edge_noise(noise[idx], df_tags[idx])
+    # min_min_attack(args, None, train_graphs, model, noise, None, None)
+    # #min_min_attack(train_graphs, model, args, noise)
 
 
     while condition:
@@ -289,7 +289,7 @@ def main():
 
         pbar = tqdm(range(args.iters_per_epoch), unit='batch')
         for pos in pbar:
-            min_min_attack(args, device, train_graphs, model, noise, None, 1)
+            min_min_attack(args, device, nsd_train_graphs, model, noise, None, 1)
             pbar.set_description('Noise Training...')
 
         nsd_train_graphs = copy.deepcopy(train_graphs)
