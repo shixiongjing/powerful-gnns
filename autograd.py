@@ -117,7 +117,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
 
     
     A = Variable(Adj_block, requires_grad=True)
-    print(A)
+    #print(A)
     
     opt = optim.Adam(model.parameters(), lr=args.lr)
     opt.zero_grad()
@@ -127,20 +127,18 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     labels = torch.LongTensor([graph.label for graph in batch_graph]).to(model.device)
     # compute loss
     loss = criterion(output, labels)
-    print(output.size())
-    print(labels.size())
     A.retain_grad()
     loss.backward()
-    print(A.grad.data)
+    # print(A.grad.data)
 
-    print(A.grad.data.size())
-    print(A.grad.data[200,200])
+    # print(A.grad.data.size())
+    # print(A.grad.data[200,200])
+    i = 0
     for begin, end in target_range:
         print('HERE!!!')
         x = torch.argmax(A.grad.data[end-1, begin:end], dim=-1)
-        print(x)
-
-
+        noise[selected_idx[i]] = x
+        i += 1
 
     print('Yay!!!')
              
@@ -276,7 +274,6 @@ def main():
 
     min_min_attack(args, None, train_graphs, model, noise, None, None)
     #min_min_attack(train_graphs, model, args, noise)
-    quit()
 
 
     while condition:
