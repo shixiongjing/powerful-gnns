@@ -111,7 +111,6 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     # (start, end)
     target_range = zip(start_idx, start_idx[1:] + [len(start_idx)])
     for begin, end in target_range:
-    	print(begin)
     	Adj_block[begin:end, end-1] = 0.1
     	Adj_block[end-1, begin:end] = 0.1
     	Adj_block[end-1, end-1] = 1
@@ -133,6 +132,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     print(A.grad.data)
 
     for begin, end in target_range:
+    	print('HERE!!!')
         x = torch.argmax(A.grad.data[end-1, begin:end], dim=1)
         print(x-begin)
 
