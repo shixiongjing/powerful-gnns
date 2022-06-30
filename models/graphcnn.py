@@ -185,6 +185,7 @@ class GraphCNN(nn.Module):
             pooled = self.maxpool(h, padded_neighbor_list)
         else:
             #If sum or average pooling
+            print(h.type())
             pooled = torch.mm(Adj_block, h)
             if self.neighbor_pooling_type == "average":
                 #If average pooling
