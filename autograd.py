@@ -128,7 +128,7 @@ def min_min_attack(args, device, train_graphs, model, noise, tags, rounds):
     # compute loss
     loss = criterion(output, labels)
     print(output.size())
-    print(label.size())
+    print(labels.size())
     A.retain_grad()
     loss.backward()
     print(A.grad.data)
