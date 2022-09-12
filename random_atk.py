@@ -230,8 +230,8 @@ def main():
     parser.add_argument('--writepoison', type=str, default="", help='filename for poisoned data')
     parser.add_argument('--lock_noise_gen', action="store_true",
                                         help='Whether to lock at noise gen')
-    parser.add_argument('--search_tag', action="store_true",
-                                        help='Whether to lock at noise gen')
+    parser.add_argument('--rand_tag', action="store_true",
+                                        help='Whether to use random tag for generated node')
     
     args = parser.parse_args()
 
@@ -267,7 +267,10 @@ def main():
     # Find tags
     A = np.array(tag_count)
     selected_tags = np.argpartition(A, num_classes)
-    df_tags = [selected_tags[graph.label] for graph in train_graphs]
+    if args.rand_tag:
+        df_tags = [randint(0, num_classes-1) for graph in train_graphs] # randint includes both ends
+    else:
+        df_tags = [selected_tags[graph.label] for graph in train_graphs]
 
     condition = True
     noise = [randint(0, len(x.g)-1) for x in train_graphs] # values exclude self
