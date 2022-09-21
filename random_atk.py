@@ -11,6 +11,7 @@ from tqdm import tqdm
 from util import load_data, write_data, separate_data
 from models.graphcnn import GraphCNN
 import copy
+import time
 
 criterion = nn.CrossEntropyLoss()
 
@@ -232,6 +233,7 @@ def main():
                                         help='Whether to lock at noise gen')
     parser.add_argument('--rand_tag', action="store_true",
                                         help='Whether to use random tag for generated node')
+    parser.add_argument('--timeseed', action="store_true", help="whether to use time as seed for random")
     
     args = parser.parse_args()
 
@@ -241,7 +243,9 @@ def main():
 
     #set up seeds and gpu device
     torch.manual_seed(0)
-    np.random.seed(0)    
+    np.random.seed(0)
+    if(args.timeseed):
+        np.random.seed(seed=int(time.time()))    
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
